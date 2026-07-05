@@ -59,7 +59,7 @@ class _LogoMark extends StatelessWidget {
       width: 96,
       height: 96,
       decoration: BoxDecoration(
-        color: AppColors.black,
+        color: Theme.of(context).colorScheme.onSurface,
         borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
       ),
       child: const Icon(Icons.auto_awesome, color: AppColors.white, size: 44),
