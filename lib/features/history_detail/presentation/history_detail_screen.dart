@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -15,6 +16,7 @@ import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/primary_button.dart';
 import '../../../core/widgets/secondary_button.dart';
 import '../../../domain/models/models.dart';
+import '../../../providers/palette_provider.dart';
 import '../../../providers/repository_providers.dart';
 import '../../history/presentation/history_controller.dart';
 import 'history_detail_controller.dart';
@@ -73,18 +75,26 @@ class _DetailContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(AppSpacing.pagePadding),
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.pagePadding,
+        AppSpacing.pagePadding,
+        AppSpacing.pagePadding,
+        120.0,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _MotifImage(imageUrl: motif.imageUrl),
+          _MotifImage(
+            imageUrl: motif.imageUrl,
+            heroTag: motif.id,
+          ),
           const SizedBox(height: AppSpacing.lg),
           Row(
             children: [
               Expanded(
                 child: Text(
                   motif.title ?? 'Motif',
-                  style: AppTypography.headingMedium,
+                  style: Theme.of(context).textTheme.headlineMedium,
                 ),
               ),
               const SizedBox(width: AppSpacing.sm),
@@ -99,6 +109,8 @@ class _DetailContent extends StatelessWidget {
           const SizedBox(height: AppSpacing.lg),
           _MetadataGrid(motif: motif),
           const SizedBox(height: AppSpacing.lg),
+          _ColorPalette(imageUrl: motif.imageUrl),
+          const SizedBox(height: AppSpacing.lg),
           _DetailActions(motif: motif),
         ],
       ),
@@ -107,15 +119,19 @@ class _DetailContent extends StatelessWidget {
 }
 
 class _MotifImage extends StatelessWidget {
-  const _MotifImage({required this.imageUrl});
+  const _MotifImage({
+    required this.imageUrl,
+    this.heroTag,
+  });
 
   final String imageUrl;
+  final String? heroTag;
 
   bool get _isNetwork => imageUrl.startsWith('http');
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
+    final Widget child = ClipRRect(
       borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
       child: AspectRatio(
         aspectRatio: 1,
@@ -135,6 +151,14 @@ class _MotifImage extends StatelessWidget {
               ),
       ),
     );
+
+    if (heroTag != null) {
+      return Hero(
+        tag: heroTag!,
+        child: child,
+      );
+    }
+    return child;
   }
 }
 
@@ -168,12 +192,12 @@ class _Tag extends StatelessWidget {
       padding:
           const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 4),
       decoration: BoxDecoration(
-        color: AppColors.black,
+        color: Theme.of(context).colorScheme.primary,
         borderRadius: BorderRadius.circular(AppSpacing.sm),
       ),
       child: Text(
         label,
-        style: AppTypography.labelSmallCaps.copyWith(color: AppColors.white),
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(color: AppColors.white),
       ),
     );
   }
@@ -247,9 +271,9 @@ class _MetaItem extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: AppColors.surfaceGray,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
-        border: Border.all(color: AppColors.borderGray),
+        border: Border.all(color: Theme.of(context).dividerTheme.color ?? AppColors.borderGray),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -262,8 +286,8 @@ class _MetaItem extends StatelessWidget {
                 Container(
                   width: 12,
                   height: 12,
-                  decoration: const BoxDecoration(
-                    color: AppColors.black,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.onSurface,
                     shape: BoxShape.circle,
                   ),
                 ),
@@ -273,7 +297,7 @@ class _MetaItem extends StatelessWidget {
                 child: Text(
                   value,
                   style: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.black,
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -401,4 +425,76 @@ String _formatComplexity(double? complexity) {
           ? 'Sedang'
           : 'Rendah';
   return '$label (${complexity.toStringAsFixed(2)})';
+}
+
+class _ColorPalette extends ConsumerWidget {
+  const _ColorPalette({required this.imageUrl});
+
+  final String imageUrl;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final paletteAsync = ref.watch(paletteProvider(imageUrl));
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+        border: Border.all(color: Theme.of(context).dividerTheme.color ?? AppColors.borderGray),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'PALET WARNA EKSTRAKSI',
+            style: AppTypography.labelSmallCaps.copyWith(color: AppColors.gray),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          paletteAsync.when(
+            data: (colors) {
+              if (colors.isEmpty) {
+                return const Text('Gagal mengekstrak warna', style: AppTypography.bodyMedium);
+              }
+              return Wrap(
+                spacing: AppSpacing.sm,
+                runSpacing: AppSpacing.sm,
+                children: colors.map((color) {
+                  return Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      color: color,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Theme.of(context).dividerTheme.color ?? AppColors.borderGray),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.black.withOpacity(0.1),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                  );
+                }).toList(),
+              ).animate().fade(duration: 400.ms).slideY(begin: 0.1, duration: 400.ms, curve: Curves.easeOutQuart);
+            },
+            loading: () => const Row(
+              children: [
+                SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+                SizedBox(width: AppSpacing.sm),
+                Text('Mengekstrak palet...', style: AppTypography.bodyMedium),
+              ],
+            ),
+            error: (_, __) => const Text('Gagal memuat palet', style: AppTypography.bodyMedium),
+          ),
+        ],
+      ),
+    );
+  }
 }
