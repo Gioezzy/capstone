@@ -13,6 +13,7 @@ final _bottomNavPaths = <String>[
   Routes.homePath,
   Routes.historyPath,
   Routes.settingsPath,
+  Routes.profilePath,
   Routes.resultPath,
 ];
 
@@ -38,6 +39,9 @@ final _definedPaths = <String>[
   Routes.historyDetailPathFor('gen-042'),
   Routes.settingsPath,
   Routes.aboutPath,
+  Routes.loginPath,
+  Routes.registerPath,
+  Routes.profilePath,
 ];
 
 void main() {
@@ -57,10 +61,14 @@ void main() {
   Future<void> pumpAt(WidgetTester tester, String path) async {
     await tester.binding.setSurfaceSize(const Size(1080, 2400));
     addTearDown(() => tester.binding.setSurfaceSize(null));
-    final router = createAppRouter();
+    final container = ProviderContainer(
+      overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+    );
+    addTearDown(container.dispose);
+    final router = container.read(routerProvider);
     await tester.pumpWidget(
-      ProviderScope(
-        overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+      UncontrolledProviderScope(
+        container: container,
         child: MaterialApp.router(routerConfig: router),
       ),
     );
@@ -78,8 +86,8 @@ void main() {
   group('Property 7: Konsistensi Navigasi', () {
     test('all defined routes are distinct and fully enumerated (no orphans)',
         () {
-      expect(_definedPaths.length, 10);
-      expect(_definedPaths.toSet().length, 10);
+      expect(_definedPaths.length, 13);
+      expect(_definedPaths.toSet().length, 13);
     });
 
     for (final path in _definedPaths) {
