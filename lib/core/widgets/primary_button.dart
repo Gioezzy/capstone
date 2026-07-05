@@ -26,35 +26,56 @@ class PrimaryButton extends StatelessWidget {
     // Disable interaction while loading.
     final VoidCallback? effectiveOnPressed = isLoading ? null : onPressed;
 
-    final ButtonStyle style = ElevatedButton.styleFrom(
-      backgroundColor: AppColors.black,
-      foregroundColor: AppColors.white,
-      disabledBackgroundColor: AppColors.gray,
-      disabledForegroundColor: AppColors.white,
-      textStyle: AppTypography.buttonLabel,
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.lg,
-        vertical: AppSpacing.md,
-      ),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
-      ),
-      elevation: 0,
-    );
+    final isEnabled = effectiveOnPressed != null;
 
-    final Widget button = ElevatedButton(
-      onPressed: effectiveOnPressed,
-      style: style,
-      child: isLoading
-          ? const SizedBox(
-              width: 18,
-              height: 18,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation<Color>(AppColors.white),
-              ),
-            )
-          : _buildContent(),
+    final Widget button = Container(
+      decoration: BoxDecoration(
+        gradient: isEnabled
+            ? const LinearGradient(
+                colors: [AppColors.maroon, AppColors.black],
+              )
+            : null,
+        color: isEnabled ? null : AppColors.gray,
+        borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
+        boxShadow: isEnabled
+            ? [
+                BoxShadow(
+                  color: AppColors.maroon.withOpacity(0.25),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ]
+            : null,
+      ),
+      child: ElevatedButton(
+        onPressed: effectiveOnPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+          foregroundColor: AppColors.white,
+          disabledBackgroundColor: Colors.transparent,
+          disabledForegroundColor: AppColors.white.withOpacity(0.6),
+          textStyle: AppTypography.buttonLabel,
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.lg,
+            vertical: AppSpacing.md,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
+          ),
+          elevation: 0,
+        ),
+        child: isLoading
+            ? const SizedBox(
+                width: 18,
+                height: 18,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.white),
+                ),
+              )
+            : _buildContent(),
+      ),
     );
 
     return expand ? SizedBox(width: double.infinity, child: button) : button;
