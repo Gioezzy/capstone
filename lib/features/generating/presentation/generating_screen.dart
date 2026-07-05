@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lottie/lottie.dart';
 
 import '../../../core/router/routes.dart';
 import '../../../core/theme/app_colors.dart';
@@ -26,9 +28,15 @@ class _GeneratingScreenState extends ConsumerState<GeneratingScreen> {
   @override
   void initState() {
     super.initState();
+    
+    
     // Start once after first frame to avoid mutating providers during build.
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(generatingControllerProvider.notifier).start(widget.request);
+      try {
+        ref.read(generatingControllerProvider.notifier).start(widget.request);
+      } catch (e) {
+        debugPrint(e.toString());
+      }
     });
   }
 
@@ -89,7 +97,9 @@ class _LoadingView extends StatelessWidget {
           'Sedang Menghasilkan Motif Baru',
           style: AppTypography.headingMedium,
           textAlign: TextAlign.center,
-        ),
+        )
+        .animate(onPlay: (controller) => controller.repeat())
+        .shimmer(duration: 2.seconds, color: AppColors.gold.withOpacity(0.8)),
         const SizedBox(height: AppSpacing.sm),
         Text(
           'Memproses Noise Vector...',
@@ -97,7 +107,24 @@ class _LoadingView extends StatelessWidget {
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: AppSpacing.xl),
-        const _GanDiagram(),
+        Center(
+          child: Lottie.network(
+            'https://assets3.lottiefiles.com/packages/lf20_t2xkxb22.json', // Aesthetic abstract loader
+            height: 150,
+            width: 150,
+            fit: BoxFit.contain,
+            errorBuilder: (context, error, stackTrace) => const Icon(
+              Icons.auto_awesome,
+              size: 64,
+              color: AppColors.gold,
+            )
+            .animate(onPlay: (controller) => controller.repeat())
+            .shimmer(duration: 2.seconds),
+          ),
+        )
+        .animate()
+        .fade(duration: 500.ms)
+        .scaleXY(begin: 0.8, end: 1.0, duration: 500.ms, curve: Curves.easeOutBack),
         const SizedBox(height: AppSpacing.xl),
         Expanded(child: _SystemLogPanel(logs: logs)),
         const SizedBox(height: AppSpacing.lg),
@@ -109,65 +136,7 @@ class _LoadingView extends StatelessWidget {
   }
 }
 
-// Generator <-> Discriminator with "Data →" and "← Feedback" arrows.
-class _GanDiagram extends StatelessWidget {
-  const _GanDiagram();
 
-  @override
-  Widget build(BuildContext context) {
-    return const Row(
-      children: [
-        Expanded(child: _DiagramBox(label: 'Generator', icon: Icons.auto_awesome)),
-        SizedBox(width: AppSpacing.sm),
-        _DiagramArrows(),
-        SizedBox(width: AppSpacing.sm),
-        Expanded(child: _DiagramBox(label: 'Discriminator', icon: Icons.search)),
-      ],
-    );
-  }
-}
-
-class _DiagramBox extends StatelessWidget {
-  const _DiagramBox({required this.label, required this.icon});
-
-  final String label;
-  final IconData icon;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
-      decoration: BoxDecoration(
-        border: Border.all(color: AppColors.borderGray),
-        borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
-      ),
-      child: Column(
-        children: [
-          Icon(icon, color: AppColors.graphite),
-          const SizedBox(height: AppSpacing.sm),
-          Text(label, style: AppTypography.bodyMedium),
-        ],
-      ),
-    );
-  }
-}
-
-class _DiagramArrows extends StatelessWidget {
-  const _DiagramArrows();
-
-  @override
-  Widget build(BuildContext context) {
-    final style = AppTypography.labelSmallCaps.copyWith(color: AppColors.graphite);
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text('Data →', style: style),
-        const SizedBox(height: AppSpacing.xs),
-        Text('← Feedback', style: style),
-      ],
-    );
-  }
-}
 
 // "PROSES SYSTEM" terminal-style scrolling log panel.
 class _SystemLogPanel extends StatelessWidget {
@@ -237,7 +206,7 @@ class _ProgressSection extends StatelessWidget {
             const Text('Generasi Motif', style: AppTypography.bodyMedium),
             Text(
               '${(progress * 100).round()}%',
-              style: AppTypography.bodyMedium.copyWith(color: AppColors.black),
+              style: AppTypography.bodyMedium.copyWith(color: Theme.of(context).colorScheme.onSurface),
             ),
           ],
         ),
@@ -268,7 +237,7 @@ class _ErrorView extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.error_outline, size: 48, color: AppColors.graphite),
+          Icon(Icons.error_outline, size: 48, color: Theme.of(context).colorScheme.onSurface),
           const SizedBox(height: AppSpacing.md),
           const Text(
             'Generasi Gagal',

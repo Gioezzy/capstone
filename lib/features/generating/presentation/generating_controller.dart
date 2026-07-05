@@ -111,6 +111,7 @@ class GeneratingController extends StateNotifier<GenerateState> {
     // Ignore re-entrant start while already running.
     if (state is GenerateLoading) return;
 
+
     _cancelled = false;
     _lastProgress = 0.0;
     _logs = const [];
@@ -129,10 +130,13 @@ class GeneratingController extends StateNotifier<GenerateState> {
 
     try {
       final result = await _repo.generateMotif(request);
+      
       if (_cancelled) {
         state = const GenerateCancelled();
         return;
       }
+      
+      
       _emitLoading(1.0, 'Motif berhasil dihasilkan.');
       state = GenerateSuccess(result);
     } on AppException catch (e) {
@@ -141,12 +145,15 @@ class GeneratingController extends StateNotifier<GenerateState> {
         return;
       }
       state = GenerateError(e);
-    } catch (_) {
+    } catch (e) {
+      
       if (_cancelled) {
         state = const GenerateCancelled();
         return;
       }
-      state = const GenerateError(UnknownException());
+      // Keep the real error visible while integrating the API backend.
+      // This avoids hiding JSON parsing or routing issues behind a generic UI.
+      state = GenerateError(UnknownException(e.toString()));
     }
   }
 

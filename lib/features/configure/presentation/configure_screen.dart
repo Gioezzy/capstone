@@ -185,7 +185,7 @@ class _ResolutionCard extends StatelessWidget {
                   Text(
                     title,
                     style: AppTypography.bodyMedium.copyWith(
-                      color: AppColors.black,
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
