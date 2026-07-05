@@ -42,9 +42,9 @@ class AppSettingsNotifier extends StateNotifier<AppSettings> {
     await _store.save(state);
   }
 
-  Future<void> updateMonochrome(bool monochromeTheme) async {
+  Future<void> updateThemeMode(bool isDarkMode) async {
     state = state.copyWith(
-        monochromeTheme: monochromeTheme, updatedAt: DateTime.now());
+        isDarkMode: isDarkMode, updatedAt: DateTime.now());
     await _store.save(state);
   }
 }

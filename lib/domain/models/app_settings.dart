@@ -5,14 +5,14 @@ class AppSettings {
   final String id;
   final String baseUrl;
   final Resolution defaultResolution;
-  final bool monochromeTheme;
+  final bool isDarkMode;
   final DateTime updatedAt;
 
   const AppSettings({
     required this.id,
     required this.baseUrl,
     required this.defaultResolution,
-    required this.monochromeTheme,
+    required this.isDarkMode,
     required this.updatedAt,
   });
 
@@ -21,7 +21,7 @@ class AppSettings {
         baseUrl: json['base_url'] as String,
         defaultResolution:
             Resolution.fromApi(json['default_resolution'] as String),
-        monochromeTheme: json['monochrome_theme'] as bool,
+        isDarkMode: json['is_dark_mode'] as bool? ?? false,
         updatedAt: DateTime.parse(json['updated_at'] as String),
       );
 
@@ -29,7 +29,7 @@ class AppSettings {
         'id': id,
         'base_url': baseUrl,
         'default_resolution': defaultResolution.apiValue,
-        'monochrome_theme': monochromeTheme,
+        'is_dark_mode': isDarkMode,
         'updated_at': updatedAt.toIso8601String(),
       };
 
@@ -37,14 +37,14 @@ class AppSettings {
     String? id,
     String? baseUrl,
     Resolution? defaultResolution,
-    bool? monochromeTheme,
+    bool? isDarkMode,
     DateTime? updatedAt,
   }) =>
       AppSettings(
         id: id ?? this.id,
         baseUrl: baseUrl ?? this.baseUrl,
         defaultResolution: defaultResolution ?? this.defaultResolution,
-        monochromeTheme: monochromeTheme ?? this.monochromeTheme,
+        isDarkMode: isDarkMode ?? this.isDarkMode,
         updatedAt: updatedAt ?? this.updatedAt,
       );
 
@@ -55,7 +55,7 @@ class AppSettings {
           other.id == id &&
           other.baseUrl == baseUrl &&
           other.defaultResolution == defaultResolution &&
-          other.monochromeTheme == monochromeTheme &&
+          other.isDarkMode == isDarkMode &&
           other.updatedAt == updatedAt;
 
   @override
@@ -63,16 +63,16 @@ class AppSettings {
         id,
         baseUrl,
         defaultResolution,
-        monochromeTheme,
+        isDarkMode,
         updatedAt,
       );
 
   // Default settings used before any persisted value exists.
   static final AppSettings defaults = AppSettings(
     id: 'local',
-    baseUrl: 'https://api.songketai.dev/v1',
+    baseUrl: 'http://127.0.0.1:8000',
     defaultResolution: Resolution.px128,
-    monochromeTheme: true,
+    isDarkMode: false,
     updatedAt: DateTime.now(),
   );
 }
