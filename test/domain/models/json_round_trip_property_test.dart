@@ -86,7 +86,7 @@ AppSettings _settings(Random r) => AppSettings(
       id: _str(r),
       baseUrl: _str(r),
       defaultResolution: _pick(r, Resolution.values),
-      monochromeTheme: r.nextBool(),
+      isDarkMode: r.nextBool(),
       updatedAt: _dateTime(r),
     );
 

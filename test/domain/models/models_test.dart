@@ -31,7 +31,7 @@ AppSettings _settings() => AppSettings(
       id: 'local',
       baseUrl: 'https://api.songketai.dev/v1',
       defaultResolution: Resolution.px128,
-      monochromeTheme: true,
+      isDarkMode: true,
       updatedAt: _t1,
     );
 
@@ -121,7 +121,7 @@ void main() {
       expect(_settings(), equals(_settings()));
       expect(_settings().hashCode, equals(_settings().hashCode));
       expect(
-        _settings().copyWith(monochromeTheme: false),
+        _settings().copyWith(isDarkMode: false),
         isNot(equals(_settings())),
       );
     });
@@ -194,16 +194,16 @@ void main() {
   });
 
   group('AppSettings copyWith', () {
-    test('overrides defaultResolution, baseUrl, monochromeTheme', () {
+    test('overrides defaultResolution, baseUrl, isDarkMode', () {
       final a = _settings();
       final b = a.copyWith(
         defaultResolution: Resolution.px64,
         baseUrl: 'https://other/v2',
-        monochromeTheme: false,
+        isDarkMode: false,
       );
       expect(b.defaultResolution, Resolution.px64);
       expect(b.baseUrl, 'https://other/v2');
-      expect(b.monochromeTheme, false);
+      expect(b.isDarkMode, false);
       expect(b.id, a.id);
       expect(b, isNot(equals(a)));
     });
