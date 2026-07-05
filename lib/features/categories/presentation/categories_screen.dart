@@ -17,7 +17,19 @@ class CategoriesScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Motif Categories')),
+      appBar: AppBar(
+        title: const Text('Motif Categories'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go(Routes.homePath);
+            }
+          },
+        ),
+      ),
       body: Column(
         children: [
           Padding(
