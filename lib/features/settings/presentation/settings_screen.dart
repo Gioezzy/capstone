@@ -43,7 +43,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('Settings')),
       body: ListView(
-        padding: const EdgeInsets.all(AppSpacing.pagePadding),
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.pagePadding,
+          AppSpacing.pagePadding,
+          AppSpacing.pagePadding,
+          120.0,
+        ),
         children: [
           const _Label('Backend API URL'),
           const SizedBox(height: AppSpacing.sm),
@@ -76,14 +81,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           const Divider(height: AppSpacing.xl),
           SwitchListTile(
             contentPadding: EdgeInsets.zero,
-            title: const Text('Tema Aplikasi', style: AppTypography.bodyMedium),
+            title: const Text('Dark Mode', style: AppTypography.bodyMedium),
             subtitle: Text(
-              'Monochrome / Grayscale',
+              'Aktifkan tema gelap',
               style: AppTypography.bodyMedium.copyWith(color: AppColors.gray),
             ),
-            value: settings.monochromeTheme,
+            value: settings.isDarkMode,
             onChanged: (value) =>
-                ref.read(appSettingsProvider.notifier).updateMonochrome(value),
+                ref.read(appSettingsProvider.notifier).updateThemeMode(value),
           ),
           const Divider(height: AppSpacing.xl),
           ListTile(
@@ -108,6 +113,6 @@ class _Label extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Text(
         text.toUpperCase(),
-        style: AppTypography.labelSmallCaps,
+        style: Theme.of(context).textTheme.labelSmall,
       );
 }

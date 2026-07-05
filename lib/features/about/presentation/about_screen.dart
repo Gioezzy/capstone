@@ -62,7 +62,7 @@ class _Header extends StatelessWidget {
           width: 88,
           height: 88,
           decoration: BoxDecoration(
-            color: AppColors.black,
+            color: Theme.of(context).colorScheme.onSurface,
             borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
           ),
           child: const Icon(
@@ -108,7 +108,7 @@ class _InfoCard extends StatelessWidget {
           const SizedBox(height: AppSpacing.sm),
           Text(
             value,
-            style: AppTypography.bodyMedium.copyWith(color: AppColors.black),
+            style: AppTypography.bodyMedium.copyWith(color: Theme.of(context).colorScheme.onSurface),
           ),
         ],
       ),
