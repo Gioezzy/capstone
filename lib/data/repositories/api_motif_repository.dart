@@ -1,7 +1,13 @@
+import 'dart:io';
+
 import 'package:capstone/core/network/api_client.dart';
 import 'package:capstone/core/network/api_endpoints.dart';
 import 'package:capstone/domain/models/models.dart';
 import 'package:capstone/domain/repositories/motif_repository.dart';
+import 'package:dio/dio.dart' as dio_client;
+import 'package:flutter/foundation.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 // REST implementation. Maps endpoints <-> models per the API contract.
 // Errors surface as AppException from ApiClient. Wired later via AppConfig.
@@ -27,11 +33,37 @@ class ApiMotifRepository implements MotifRepository {
 
   @override
   Future<GenerateResult> generateMotif(GenerateRequest request) async {
+    
     final data = await _client.post(
       ApiEndpoints.generate,
       data: request.toJson(),
     );
-    return GenerateResult.fromJson(_unwrap(data) as Map<String, dynamic>);
+    
+    
+    final json = _unwrap(data) as Map<String, dynamic>;
+    
+
+    // New backend contract: {"motif": {...}, "used_seed": ..., "history_id": ...}.
+    if (json['motif'] is Map<String, dynamic>) {
+      return GenerateResult.fromJson(json);
+    }
+
+    
+    // Backward-compatible fallback for the earlier backend response that
+    // returned motif fields directly inside "data".
+    final historyId = json['history_id'] as String;
+    return GenerateResult.fromJson({
+      'motif': {
+        'id': json['id'],
+        'history_id': historyId,
+        'category_id': json['category_id'],
+        'image_url': json['image_url'],
+        'created_at': json['created_at'],
+        'title': json['title'],
+      },
+      'used_seed': request.noiseSeed ?? 0,
+      'history_id': historyId,
+    });
   }
 
   @override
@@ -72,11 +104,48 @@ class ApiMotifRepository implements MotifRepository {
   Future<MotifImage> getDownloadInfo(String motifId) async {
     final data = await _client.get(ApiEndpoints.downloadMotif(motifId));
     final json = _unwrap(data) as Map<String, dynamic>;
+    final url = json['url'] as String;
+    final fileName = json['file_name'] as String;
+
+    try {
+      // Minta izin penyimpanan terlebih dahulu (dibungkus try-catch agar tidak crash jika belum full rebuild)
+      try {
+        await Permission.storage.request();
+      } catch (pe) {
+        debugPrint('WARNING: Gagal meminta izin storage: $pe');
+      }
+
+      final dio = dio_client.Dio();
+      
+      Directory? dir;
+      if (Platform.isAndroid) {
+        // Coba simpan ke folder Download publik Android
+        dir = Directory('/storage/emulated/0/Download');
+        if (!await dir.exists()) {
+          dir = await getExternalStorageDirectory();
+        }
+      } else {
+        dir = await getDownloadsDirectory();
+      }
+
+      // Jika direktori ditemukan, lakukan pengunduhan biner file secara nyata
+      if (dir != null) {
+        final savePath = '${dir.path}/$fileName';
+        await dio.download(url, savePath);
+        debugPrint('INFO: File berhasil diunduh ke $savePath');
+      } else {
+        throw Exception('Direktori penyimpanan tidak tersedia');
+      }
+    } catch (e) {
+      debugPrint('ERROR: Gagal mengunduh file: $e');
+      throw Exception('Gagal menyimpan file ke perangkat lokal: $e');
+    }
+
     return MotifImage(
       id: motifId,
       generatedMotifId: motifId,
-      url: json['url'] as String,
-      fileName: json['file_name'] as String,
+      url: url,
+      fileName: fileName,
       createdAt: DateTime.now(),
     );
   }
