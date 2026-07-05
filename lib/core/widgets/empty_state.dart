@@ -43,8 +43,6 @@ class EmptyState extends StatelessWidget {
               OutlinedButton(
                 onPressed: onAction,
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.black,
-                  side: const BorderSide(color: AppColors.black),
                   textStyle: AppTypography.buttonLabel,
                   shape: RoundedRectangleBorder(
                     borderRadius:

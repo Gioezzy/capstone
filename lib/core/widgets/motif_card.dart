@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 import '../theme/app_colors.dart';
 import '../theme/app_spacing.dart';
@@ -9,7 +10,7 @@ import '../theme/app_typography.dart';
 enum MotifCardMode { grid, list }
 
 // Reusable motif card with grid and list layouts.
-class MotifCard extends StatelessWidget {
+class MotifCard extends StatefulWidget {
   const MotifCard.grid({
     super.key,
     required this.title,
@@ -18,6 +19,7 @@ class MotifCard extends StatelessWidget {
     this.subtitle,
     this.dateText,
     this.tagLabel,
+    this.heroTag,
     this.onTap,
     this.trailing,
   }) : mode = MotifCardMode.grid;
@@ -30,6 +32,7 @@ class MotifCard extends StatelessWidget {
     this.subtitle,
     this.dateText,
     this.tagLabel,
+    this.heroTag,
     this.onTap,
     this.trailing,
   }) : mode = MotifCardMode.list;
@@ -41,27 +44,56 @@ class MotifCard extends StatelessWidget {
   final String? subtitle;
   final String? dateText;
   final String? tagLabel;
+  final String? heroTag;
   final VoidCallback? onTap;
   final Widget? trailing;
 
   bool get _isNetwork => imageUrl != null && imageUrl!.startsWith('http');
 
   @override
+  State<MotifCard> createState() => _MotifCardState();
+}
+
+class _MotifCardState extends State<MotifCard> {
+  bool _isHovered = false;
+
+  @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: EdgeInsets.zero,
-      clipBehavior: Clip.antiAlias,
-      shape: RoundedRectangleBorder(
+    return Container(
+      decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
-        side: const BorderSide(
-          color: AppColors.borderGray,
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.maroon.withOpacity(0.08),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Card(
+        margin: EdgeInsets.zero,
+        clipBehavior: Clip.antiAlias,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+          side: BorderSide(
+            color: _isHovered ? AppColors.gold : AppColors.borderGray,
+            width: _isHovered ? 1.5 : 1,
+          ),
+        ),
+        child: InkWell(
+          onTap: widget.onTap,
+          onHover: (hover) => setState(() => _isHovered = hover),
+          onHighlightChanged: (highlight) => setState(() => _isHovered = highlight),
+          child: widget.mode == MotifCardMode.grid ? _buildGrid() : _buildList(),
         ),
       ),
-      child: InkWell(
-        onTap: onTap,
-        child: mode == MotifCardMode.grid ? _buildGrid() : _buildList(),
-      ),
-    );
+    )
+    .animate(target: _isHovered ? 1 : 0)
+    .scaleXY(end: 1.02, duration: 150.ms, curve: Curves.easeOut)
+    .animate() // Entrance animation
+    .fade(duration: 400.ms)
+    .slideY(begin: 0.1, duration: 400.ms, curve: Curves.easeOutQuart);
   }
 
   Widget _buildGrid() {
@@ -69,26 +101,26 @@ class MotifCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        AspectRatio(aspectRatio: 1, child: _Thumbnail(this)),
+        AspectRatio(aspectRatio: 1, child: _Thumbnail(widget)),
         Padding(
           padding: const EdgeInsets.all(AppSpacing.sm),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (code != null) _CodeLabel(code!),
+              if (widget.code != null) _CodeLabel(widget.code!),
               Text(
-                title,
+                widget.title,
                 style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.black,
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontWeight: FontWeight.w600,
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
-              if (subtitle != null || dateText != null)
+              if (widget.subtitle != null || widget.dateText != null)
                 Text(
-                  subtitle ?? dateText!,
+                  widget.subtitle ?? widget.dateText!,
                   style: AppTypography.bodyMedium.copyWith(
                     fontSize: 12,
                     color: AppColors.gray,
@@ -110,7 +142,7 @@ class MotifCard extends StatelessWidget {
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(AppSpacing.sm),
-            child: SizedBox(width: 64, height: 64, child: _Thumbnail(this)),
+            child: SizedBox(width: 64, height: 64, child: _Thumbnail(widget)),
           ),
           const SizedBox(width: AppSpacing.md),
           Expanded(
@@ -118,21 +150,21 @@ class MotifCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                if (code != null) _CodeLabel(code!),
+                if (widget.code != null) _CodeLabel(widget.code!),
                 Text(
-                  title,
+                  widget.title,
                   style: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.black,
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontWeight: FontWeight.w600,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                if (tagLabel != null || dateText != null)
+                if (widget.tagLabel != null || widget.dateText != null)
                   Padding(
                     padding: const EdgeInsets.only(top: AppSpacing.xs),
                     child: Text(
-                      [tagLabel, dateText].whereType<String>().join(' · '),
+                      [widget.tagLabel, widget.dateText].whereType<String>().join(' · '),
                       style: AppTypography.bodyMedium.copyWith(
                         fontSize: 12,
                         color: AppColors.gray,
@@ -144,15 +176,16 @@ class MotifCard extends StatelessWidget {
               ],
             ),
           ),
-          if (trailing != null) ...[
+          if (widget.trailing != null) ...[
             const SizedBox(width: AppSpacing.sm),
-            trailing!,
+            widget.trailing!,
           ],
         ],
       ),
     );
   }
 }
+
 
 // Resolves network/asset/placeholder image for a card.
 class _Thumbnail extends StatelessWidget {
@@ -163,20 +196,32 @@ class _Thumbnail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final url = card.imageUrl;
-    if (url == null) return const _Placeholder();
-    if (card._isNetwork) {
-      return CachedNetworkImage(
+    Widget child;
+
+    if (url == null) {
+      child = const _Placeholder();
+    } else if (card._isNetwork) {
+      child = CachedNetworkImage(
         imageUrl: url,
         fit: BoxFit.cover,
         placeholder: (_, __) => const _Placeholder(),
         errorWidget: (_, __, ___) => const _Placeholder(broken: true),
       );
+    } else {
+      child = Image.asset(
+        url,
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => const _Placeholder(broken: true),
+      );
     }
-    return Image.asset(
-      url,
-      fit: BoxFit.cover,
-      errorBuilder: (_, __, ___) => const _Placeholder(broken: true),
-    );
+
+    if (card.heroTag != null) {
+      return Hero(
+        tag: card.heroTag!,
+        child: child,
+      );
+    }
+    return child;
   }
 }
 

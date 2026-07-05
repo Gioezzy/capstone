@@ -70,8 +70,6 @@ class AsyncValueView<T> extends StatelessWidget {
               OutlinedButton(
                 onPressed: onRetry,
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.black,
-                  side: const BorderSide(color: AppColors.black),
                   textStyle: AppTypography.buttonLabel,
                   shape: RoundedRectangleBorder(
                     borderRadius:

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../theme/app_colors.dart';
 import '../theme/app_typography.dart';
 
 // Section title with an optional trailing action link.
@@ -34,7 +33,7 @@ class SectionHeader extends StatelessWidget {
             child: Text(
               actionLabel!,
               style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.black,
+                color: Theme.of(context).colorScheme.onSurface,
                 fontWeight: FontWeight.w600,
               ),
             ),
