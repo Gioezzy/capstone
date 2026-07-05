@@ -8,8 +8,9 @@ class AppSpacing {
   static const double lg = 24;
   static const double xl = 32;
 
-  static const double cardRadius = 12;
-  static const double buttonRadius = 10;
+  static const double cardRadius = 16;
+  static const double buttonRadius = 12;
+  static const double bottomNavRadius = 24;
   static const double borderWidth = 1;
   static const double pagePadding = 16;
 }

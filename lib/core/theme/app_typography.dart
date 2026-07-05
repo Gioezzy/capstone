@@ -1,7 +1,5 @@
 import 'package:flutter/widgets.dart';
 
-import 'app_colors.dart';
-
 // Typography design tokens.
 class AppTypography {
   AppTypography._();
@@ -13,7 +11,6 @@ class AppTypography {
     fontFamily: serifFamily,
     fontSize: 32,
     fontWeight: FontWeight.w600,
-    color: AppColors.black,
     height: 1.2,
   );
 
@@ -21,13 +18,11 @@ class AppTypography {
     fontFamily: serifFamily,
     fontSize: 24,
     fontWeight: FontWeight.w600,
-    color: AppColors.black,
   );
 
   static const TextStyle bodyMedium = TextStyle(
     fontFamily: sansFamily,
     fontSize: 14,
-    color: AppColors.graphite,
     height: 1.5,
   );
 
@@ -36,7 +31,6 @@ class AppTypography {
     fontFamily: sansFamily,
     fontSize: 11,
     fontWeight: FontWeight.w600,
-    color: AppColors.gray,
     letterSpacing: 1.5,
   );
 
