@@ -1,12 +1,16 @@
 import 'package:capstone/core/error/app_exception.dart';
 import 'package:dio/dio.dart';
 
+import 'package:shared_preferences/shared_preferences.dart';
+
 // Dio wrapper. Centralizes request config and maps DioException -> AppException.
 class ApiClient {
   final Dio _dio;
+  final SharedPreferences? _prefs;
 
-  ApiClient({required String baseUrl, Dio? dio})
-      : _dio = dio ??
+  ApiClient({required String baseUrl, Dio? dio, SharedPreferences? prefs})
+      : _prefs = prefs,
+        _dio = dio ??
             Dio(
               BaseOptions(
                 baseUrl: baseUrl,
@@ -17,7 +21,19 @@ class ApiClient {
                   'Accept': 'application/json',
                 },
               ),
-            );
+            ) {
+    if (_prefs != null) {
+      _dio.interceptors.add(InterceptorsWrapper(
+        onRequest: (options, handler) {
+          final token = _prefs!.getString('auth_token');
+          if (token != null) {
+            options.headers['Authorization'] = 'Bearer $token';
+          }
+          return handler.next(options);
+        },
+      ));
+    }
+  }
 
   Future<dynamic> get(
     String path, {
@@ -43,6 +59,15 @@ class ApiClient {
     }
   }
 
+  Future<dynamic> put(String path, {Object? data}) async {
+    try {
+      final res = await _dio.put<dynamic>(path, data: data);
+      return res.data;
+    } on DioException catch (e) {
+      throw _mapError(e);
+    }
+  }
+
   Future<void> delete(String path) async {
     try {
       await _dio.delete<dynamic>(path);
@@ -62,7 +87,7 @@ class ApiClient {
       case DioExceptionType.badResponse:
         return _mapStatus(e);
       default:
-        return const UnknownException();
+        return UnknownException('${e.type}: ${e.message}');
     }
   }
 
@@ -76,6 +101,13 @@ class ApiClient {
       }
       return const ServerUnavailableException();
     }
+
+    // Ambil detail error spesifik dari backend (misal: "User already registered")
+    final dynamic data = e.response?.data;
+    if (data is Map && data['detail'] is String) {
+      return UnknownException(data['detail'] as String);
+    }
+
     return const UnknownException();
   }
 

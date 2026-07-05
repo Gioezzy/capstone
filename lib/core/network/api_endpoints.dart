@@ -5,6 +5,9 @@ class ApiEndpoints {
   static const String categories = '/categories';
   static const String generate = '/generate';
   static const String histories = '/histories';
+  static const String login = '/login';
+  static const String register = '/register';
+  static const String updatePassword = '/users/me/password';
 
   static String categoryById(String id) => '/categories/$id';
   static String motifById(String id) => '/motifs/$id';
