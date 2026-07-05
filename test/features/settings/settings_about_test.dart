@@ -28,7 +28,7 @@ void main() {
   bool monochromeOf(WidgetTester tester) {
     final container =
         ProviderScope.containerOf(tester.element(find.byType(SettingsScreen)));
-    return container.read(appSettingsProvider).monochromeTheme;
+    return container.read(appSettingsProvider).isDarkMode;
   }
 
   Resolution resolutionOf(WidgetTester tester) {
