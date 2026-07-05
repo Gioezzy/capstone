@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -12,6 +13,7 @@ import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/motif_card.dart';
 import '../../../domain/models/models.dart';
 import '../../../domain/repositories/motif_repository.dart';
+import '../../../providers/repository_providers.dart';
 import '../../categories/presentation/categories_controller.dart';
 import 'history_controller.dart';
 
@@ -39,6 +41,7 @@ class HistoryScreen extends ConsumerWidget {
             child: AsyncValueView<List<GenerateHistory>>(
               value: ref.watch(historyListProvider),
               isEmpty: (l) => l.isEmpty,
+              loading: const _ShimmerList(),
               onRetry: () => ref.invalidate(historyListProvider),
               emptyBuilder: () => EmptyState(
                 message: 'Belum ada motif',
@@ -115,20 +118,20 @@ class _FilterButton extends ConsumerWidget {
             child: Text(c.name),
           ),
       ],
-      child: const Padding(
-        padding: EdgeInsets.symmetric(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.sm,
           vertical: AppSpacing.sm,
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.filter_list, size: 18, color: AppColors.black),
-            SizedBox(width: AppSpacing.xs),
+            Icon(Icons.filter_list, size: 18, color: Theme.of(context).colorScheme.onSurface),
+            const SizedBox(width: AppSpacing.xs),
             Text(
               'Filter',
               style: TextStyle(
-                color: AppColors.black,
+                color: Theme.of(context).colorScheme.onSurface,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -152,7 +155,7 @@ class _HistoryList extends StatelessWidget {
         AppSpacing.pagePadding,
         0,
         AppSpacing.pagePadding,
-        AppSpacing.pagePadding,
+        120.0,
       ),
       itemCount: histories.length,
       separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.md),
@@ -161,12 +164,41 @@ class _HistoryList extends StatelessWidget {
         return MotifCard.list(
           imageUrl: h.generatedImage,
           code: h.id,
+          heroTag: h.id,
           title: h.categoryName ?? '-',
           tagLabel: h.tag?.name,
           dateText: _formatDate(h.createdAt),
-          trailing: IconButton(
-            icon: const Icon(Icons.more_vert),
-            onPressed: () {},
+          trailing: Consumer(
+            builder: (context, ref, child) {
+              return PopupMenuButton<String>(
+                icon: const Icon(Icons.more_vert),
+                onSelected: (value) async {
+                  if (value == 'delete') {
+                    try {
+                      await ref.read(motifRepositoryProvider).deleteHistory(h.id);
+                      ref.invalidate(historyListProvider);
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Riwayat berhasil dihapus')),
+                        );
+                      }
+                    } catch (e) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Gagal menghapus riwayat')),
+                        );
+                      }
+                    }
+                  }
+                },
+                itemBuilder: (context) => [
+                  const PopupMenuItem(
+                    value: 'delete',
+                    child: Text('Hapus Riwayat'),
+                  ),
+                ],
+              );
+            },
           ),
           onTap: () => context.push(Routes.historyDetailPathFor(h.id)),
         );
@@ -175,7 +207,6 @@ class _HistoryList extends StatelessWidget {
   }
 }
 
-// "Today, 14:30" for today, otherwise "Oct 24, 16:45".
 String _formatDate(DateTime date) {
   final now = DateTime.now();
   final isToday =
@@ -184,7 +215,6 @@ String _formatDate(DateTime date) {
   return DateFormat('MMM d, HH:mm').format(date);
 }
 
-// Error view with a "Muat Ulang" retry action.
 class _HistoryError extends StatelessWidget {
   const _HistoryError({required this.onRetry});
 
@@ -207,8 +237,6 @@ class _HistoryError extends StatelessWidget {
             OutlinedButton(
               onPressed: onRetry,
               style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.black,
-                side: const BorderSide(color: AppColors.black),
                 textStyle: AppTypography.buttonLabel,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
@@ -219,6 +247,35 @@ class _HistoryError extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _ShimmerList extends StatelessWidget {
+  const _ShimmerList();
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.separated(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.pagePadding,
+        0,
+        AppSpacing.pagePadding,
+        120.0,
+      ),
+      itemCount: 6,
+      separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.md),
+      itemBuilder: (context, i) {
+        return Container(
+          height: 80,
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surfaceVariant,
+            borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+          ),
+        )
+            .animate(onPlay: (controller) => controller.repeat())
+            .shimmer(duration: 1200.ms, color: AppColors.white.withOpacity(0.2));
+      },
     );
   }
 }
