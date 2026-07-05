@@ -5,8 +5,17 @@ class Routes {
   static const String splashPath = '/splash';
   static const String splashName = 'splash';
 
+  static const String loginPath = '/login';
+  static const String loginName = 'login';
+
+  static const String registerPath = '/register';
+  static const String registerName = 'register';
+
   static const String homePath = '/home';
   static const String homeName = 'home';
+
+  static const String profilePath = '/profile';
+  static const String profileName = 'profile';
 
   static const String categoriesPath = '/categories';
   static const String categoriesName = 'categories';
