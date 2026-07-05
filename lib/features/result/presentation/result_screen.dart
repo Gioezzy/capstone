@@ -66,7 +66,12 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
               message: 'Data tidak tersedia',
             )
           : SingleChildScrollView(
-              padding: const EdgeInsets.all(AppSpacing.pagePadding),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.pagePadding,
+                AppSpacing.pagePadding,
+                AppSpacing.pagePadding,
+                120.0,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -129,8 +134,16 @@ class _MotifCardView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        border: Border.all(color: AppColors.borderGray),
+        color: AppColors.white,
+        border: Border.all(color: AppColors.borderGray.withOpacity(0.8)),
         borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.black.withOpacity(0.04),
+            blurRadius: 16,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
       clipBehavior: Clip.antiAlias,
       child: Column(
@@ -146,29 +159,45 @@ class _MotifCardView extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(motif.title ?? 'Motif Baru', style: AppTypography.headingMedium),
-                const SizedBox(height: AppSpacing.xs),
-                Text(
-                  'Kategori: ${motif.categoryId}',
-                  style: AppTypography.bodyMedium.copyWith(color: AppColors.gray),
-                ),
                 const SizedBox(height: AppSpacing.sm),
+                
+                // Indah Category Badge/Chip
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: AppColors.maroon.withOpacity(0.06),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: AppColors.maroon.withOpacity(0.12)),
+                  ),
+                  child: Text(
+                    'Kategori: ${motif.categoryId}',
+                    style: AppTypography.bodyMedium.copyWith(
+                      fontSize: 12,
+                      color: AppColors.maroon,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0.2,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.md),
+                
+                // Modern Like/Dislike Action Chips
                 Row(
                   children: [
-                    IconButton(
-                      onPressed: onLike,
-                      color: feedback == 1 ? AppColors.black : AppColors.gray,
-                      icon: Icon(
-                        feedback == 1 ? Icons.thumb_up : Icons.thumb_up_outlined,
-                      ),
+                    _FeedbackButton(
+                      icon: Icons.thumb_up_outlined,
+                      activeIcon: Icons.thumb_up_rounded,
+                      isActive: feedback == 1,
+                      activeColor: AppColors.gold,
+                      onTap: onLike,
                     ),
-                    IconButton(
-                      onPressed: onDislike,
-                      color: feedback == -1 ? AppColors.black : AppColors.gray,
-                      icon: Icon(
-                        feedback == -1
-                            ? Icons.thumb_down
-                            : Icons.thumb_down_outlined,
-                      ),
+                    const SizedBox(width: AppSpacing.sm),
+                    _FeedbackButton(
+                      icon: Icons.thumb_down_outlined,
+                      activeIcon: Icons.thumb_down_rounded,
+                      isActive: feedback == -1,
+                      activeColor: AppColors.danger,
+                      onTap: onDislike,
                     ),
                   ],
                 ),
@@ -201,6 +230,51 @@ class _MotifImage extends StatelessWidget {
       color: AppColors.surfaceGray,
       alignment: Alignment.center,
       child: const Icon(Icons.broken_image, size: 48, color: AppColors.gray),
+    );
+  }
+}
+
+class _FeedbackButton extends StatelessWidget {
+  const _FeedbackButton({
+    required this.icon,
+    required this.activeIcon,
+    required this.isActive,
+    required this.activeColor,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final IconData activeIcon;
+  final bool isActive;
+  final Color activeColor;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeOutCubic,
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: isActive 
+              ? activeColor.withOpacity(0.12) 
+              : AppColors.surfaceGray,
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: isActive 
+                ? activeColor.withOpacity(0.4) 
+                : AppColors.borderGray.withOpacity(0.6),
+            width: 1.5,
+          ),
+        ),
+        child: Icon(
+          isActive ? activeIcon : icon,
+          size: 20,
+          color: isActive ? activeColor : AppColors.gray,
+        ),
+      ),
     );
   }
 }
