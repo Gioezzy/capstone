@@ -8,5 +8,5 @@ class AppConstants {
   static const String appBuildNumber = '1';
   static const String researcherName = 'Giovanni Yuda Prastika';
   static const String coreTechnology = 'cDCGAN';
-  static const String defaultBaseUrl = 'https://api.songketai.dev/v1';
+  static const String defaultBaseUrl = 'http://127.0.0.1:8000';
 }
