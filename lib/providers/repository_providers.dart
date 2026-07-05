@@ -2,8 +2,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/config/app_config.dart';
 import '../core/network/api_client.dart';
+import '../data/repositories/api_auth_repository.dart';
 import '../data/repositories/api_motif_repository.dart';
 import '../data/repositories/mock_motif_repository.dart';
+import '../domain/repositories/auth_repository.dart';
 import '../domain/repositories/motif_repository.dart';
 import 'settings_providers.dart';
 
@@ -11,11 +13,19 @@ import 'settings_providers.dart';
 // appSettingsProvider is read solely in the api branch, so mock mode never
 // touches the (un-overridden) sharedPreferencesProvider.
 final motifRepositoryProvider = Provider<MotifRepository>((ref) {
+  
   switch (AppConfig.dataSource) {
     case DataSource.mock:
       return MockMotifRepository();
     case DataSource.api:
       final settings = ref.watch(appSettingsProvider);
-      return ApiMotifRepository(ApiClient(baseUrl: settings.baseUrl));
+      final prefs = ref.watch(sharedPreferencesProvider);
+      return ApiMotifRepository(ApiClient(baseUrl: settings.baseUrl, prefs: prefs));
   }
+});
+
+final authRepositoryProvider = Provider<AuthRepository>((ref) {
+  final settings = ref.watch(appSettingsProvider);
+  final prefs = ref.watch(sharedPreferencesProvider);
+  return ApiAuthRepository(ApiClient(baseUrl: settings.baseUrl, prefs: prefs));
 });

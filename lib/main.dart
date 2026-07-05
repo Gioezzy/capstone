@@ -7,6 +7,8 @@ import 'providers/settings_providers.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  
   final prefs = await SharedPreferences.getInstance();
   runApp(
     ProviderScope(
