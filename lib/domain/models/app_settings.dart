@@ -67,12 +67,12 @@ class AppSettings {
         updatedAt,
       );
 
-  // Default settings used before any persisted value exists.
   static final AppSettings defaults = AppSettings(
     id: 'local',
-    baseUrl: 'http://127.0.0.1:8000',
+    baseUrl: 'https://gioezzy-capstone-model.hf.space',
     defaultResolution: Resolution.px128,
     isDarkMode: false,
     updatedAt: DateTime.now(),
   );
 }
+
