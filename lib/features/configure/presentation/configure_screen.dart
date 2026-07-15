@@ -8,12 +8,12 @@ import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/widgets/attribute_chip.dart';
 import '../../../core/widgets/primary_button.dart';
-import '../../../data/mock/mock_data.dart';
 import '../../../domain/models/models.dart';
+import '../../categories/presentation/categories_controller.dart';
 import 'configure_controller.dart';
 
 // Generate configuration screen (UC-002). Resolves category from a query
-// param categoryId via MockData while data is mock-backed.
+// param categoryId via categoriesProvider.
 class ConfigureScreen extends ConsumerWidget {
   const ConfigureScreen({super.key, required this.categoryId});
 
@@ -21,17 +21,35 @@ class ConfigureScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final category = MockData.categoryById(categoryId);
-    if (category == null) {
-      return Scaffold(
-        appBar: AppBar(title: const Text('Konfigurasi Generasi')),
-        body: const Center(child: Text('Kategori tidak tersedia')),
-      );
-    }
+    final categoriesAsync = ref.watch(categoriesProvider);
 
-    final provider = configureControllerProvider(category);
-    final state = ref.watch(provider);
-    final controller = ref.read(provider.notifier);
+    return categoriesAsync.when(
+      loading: () => const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      ),
+      error: (err, stack) => Scaffold(
+        appBar: AppBar(title: const Text('Konfigurasi Generasi')),
+        body: Center(child: Text('Gagal memuat kategori: $err')),
+      ),
+      data: (list) {
+        MotifCategory? category;
+        for (final c in list) {
+          if (c.id == categoryId) {
+            category = c;
+            break;
+          }
+        }
+
+        if (category == null) {
+          return Scaffold(
+            appBar: AppBar(title: const Text('Konfigurasi Generasi')),
+            body: const Center(child: Text('Kategori tidak tersedia')),
+          );
+        }
+
+        final provider = configureControllerProvider(category);
+        final state = ref.watch(provider);
+        final controller = ref.read(provider.notifier);
 
     return Scaffold(
       appBar: AppBar(
@@ -114,6 +132,8 @@ class ConfigureScreen extends ConsumerWidget {
           ),
         ),
       ),
+    );
+      },
     );
   }
 
