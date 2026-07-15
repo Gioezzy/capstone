@@ -1,7 +1,9 @@
+import 'dart:io';
 import 'package:capstone/core/error/app_exception.dart';
 import 'package:dio/dio.dart';
-
+import 'package:dio/io.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 
 // Dio wrapper. Centralizes request config and maps DioException -> AppException.
 class ApiClient {
@@ -19,9 +21,21 @@ class ApiClient {
                 headers: {
                   'Content-Type': 'application/json',
                   'Accept': 'application/json',
+                  'ngrok-skip-browser-warning': 'true',
+                  'Bypass-Tunnel-Reminder': 'true',
                 },
+
               ),
             ) {
+    // Bypass SSL certificate verification for dynamic development tunnels like ngrok/localtunnel
+    if (_dio.httpClientAdapter is IOHttpClientAdapter) {
+      (_dio.httpClientAdapter as IOHttpClientAdapter).createHttpClient = () {
+        final client = HttpClient();
+        client.badCertificateCallback = (X509Certificate cert, String host, int port) => true;
+        return client;
+      };
+    }
+
     if (_prefs != null) {
       _dio.interceptors.add(InterceptorsWrapper(
         onRequest: (options, handler) {
