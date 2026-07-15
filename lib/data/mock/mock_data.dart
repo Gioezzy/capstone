@@ -18,68 +18,76 @@ class MockData {
 
   static final DateTime _seededAt = DateTime.utc(2023, 10, 1, 7);
 
-  // 8 motif categories matching the mockup.
+  // 9 motif categories matching the API database.
   static final List<MotifCategory> categories = [
     MotifCategory(
       id: 'cat-001',
-      name: 'Pucuk Rebung',
-      description: 'Motif flora klasik berbentuk pucuk bambu yang menjulang.',
+      name: 'Apel',
+      description: 'Motif songket dengan bentuk yang terinspirasi dari buah apel.',
       previewImage: _placeholder,
       createdAt: _seededAt,
       updatedAt: _seededAt,
     ),
     MotifCategory(
       id: 'cat-002',
-      name: 'Nampan Perak',
-      description: 'Motif geometris simetris menyerupai nampan berkilau.',
+      name: 'Baragi',
+      description: 'Motif Baragi khas tenunan songket tradisional.',
       previewImage: _placeholder,
       createdAt: _seededAt,
       updatedAt: _seededAt,
     ),
     MotifCategory(
       id: 'cat-003',
-      name: 'Bunga Cina',
-      description: 'Motif floral padat dengan kelopak bunga yang berulang.',
+      name: 'Bungo Satangkai',
+      description: 'Motif yang menggambarkan setangkai bunga yang anggun.',
       previewImage: _placeholder,
       createdAt: _seededAt,
       updatedAt: _seededAt,
     ),
     MotifCategory(
       id: 'cat-004',
-      name: 'Bintang Meralih',
-      description: 'Motif bintang bersusun dengan pola memantul ritmis.',
+      name: 'Itiak Pulang Patang',
+      description: 'Motif yang terinspirasi dari barisan itik yang berjalan beriringan pulang di petang hari.',
       previewImage: _placeholder,
       createdAt: _seededAt,
       updatedAt: _seededAt,
     ),
     MotifCategory(
       id: 'cat-005',
-      name: 'Bunga Cengkih',
-      description: 'Motif floral kecil terinspirasi rempah cengkih.',
+      name: 'Pucuak Rabuang',
+      description: 'Motif menyerupai tunas bambu (pucuk rebung), melambangkan kehidupan yang terus tumbuh.',
       previewImage: _placeholder,
       createdAt: _seededAt,
       updatedAt: _seededAt,
     ),
     MotifCategory(
       id: 'cat-006',
-      name: 'Tampuk Manggis',
-      description: 'Motif klasik berbentuk tampuk buah manggis yang khas.',
+      name: 'Rangkiang',
+      description: 'Motif yang terinspirasi dari lumbung padi tradisional Minangkabau.',
       previewImage: _placeholder,
       createdAt: _seededAt,
       updatedAt: _seededAt,
     ),
     MotifCategory(
       id: 'cat-007',
-      name: 'Bunga Tanjung',
-      description: 'Motif floral lembut dengan susunan kelopak melingkar.',
+      name: 'Saik Galamai',
+      description: 'Motif dengan bentuk irisan galamai (makanan tradisional), melambangkan kearifan.',
       previewImage: _placeholder,
       createdAt: _seededAt,
       updatedAt: _seededAt,
     ),
     MotifCategory(
       id: 'cat-008',
-      name: 'Siku Keluang',
-      description: 'Motif geometris bersiku terinspirasi sayap kelelawar.',
+      name: 'Taratai',
+      description: 'Motif bunga teratai yang melambangkan keindahan dan kesucian.',
+      previewImage: _placeholder,
+      createdAt: _seededAt,
+      updatedAt: _seededAt,
+    ),
+    MotifCategory(
+      id: 'cat-009',
+      name: 'Tulip',
+      description: 'Motif modern songket yang mengambil bentuk bunga tulip.',
       previewImage: _placeholder,
       createdAt: _seededAt,
       updatedAt: _seededAt,
@@ -90,8 +98,8 @@ class MockData {
   static final List<GenerateHistory> histories = [
     GenerateHistory(
       id: 'gen-042',
-      categoryId: 'cat-001',
-      categoryName: 'Pucuk Rebung',
+      categoryId: 'cat-005',
+      categoryName: 'Pucuak Rabuang',
       tag: MotifTag.geometric,
       generatedImage: _placeholder,
       createdAt: DateTime.utc(2023, 10, 24, 14, 30),
@@ -99,7 +107,7 @@ class MockData {
     GenerateHistory(
       id: 'gen-041',
       categoryId: 'cat-004',
-      categoryName: 'Bintang Meralih',
+      categoryName: 'Itiak Pulang Patang',
       tag: MotifTag.classic,
       generatedImage: _placeholder,
       createdAt: DateTime.utc(2023, 10, 23, 9, 15),
@@ -107,7 +115,7 @@ class MockData {
     GenerateHistory(
       id: 'gen-040',
       categoryId: 'cat-006',
-      categoryName: 'Tampuk Manggis',
+      categoryName: 'Rangkiang',
       tag: MotifTag.floral,
       generatedImage: _placeholder,
       createdAt: DateTime.utc(2023, 10, 22, 18, 5),
@@ -115,7 +123,7 @@ class MockData {
     GenerateHistory(
       id: 'gen-039',
       categoryId: 'cat-003',
-      categoryName: 'Bunga Cina',
+      categoryName: 'Bungo Satangkai',
       tag: MotifTag.songket,
       generatedImage: _placeholder,
       createdAt: DateTime.utc(2023, 10, 21, 11, 40),
@@ -123,7 +131,7 @@ class MockData {
     GenerateHistory(
       id: 'gen-038',
       categoryId: 'cat-008',
-      categoryName: 'Siku Keluang',
+      categoryName: 'Taratai',
       tag: MotifTag.abstract,
       generatedImage: _placeholder,
       createdAt: DateTime.utc(2023, 10, 20, 8),
@@ -135,9 +143,9 @@ class MockData {
     GeneratedMotif(
       id: 'mtf-101',
       historyId: 'gen-042',
-      categoryId: 'cat-001',
+      categoryId: 'cat-005',
       imageUrl: _placeholder,
-      title: 'Songket Pucuk Rebung',
+      title: 'Songket Pucuak Rabuang',
       baseModel: 'Tradisional Nusantara v2',
       complexity: 0.85,
       primaryColor: 'Monochrome',
@@ -149,7 +157,7 @@ class MockData {
       historyId: 'gen-041',
       categoryId: 'cat-004',
       imageUrl: _placeholder,
-      title: 'Songket Bintang Meralih',
+      title: 'Songket Itiak Pulang Patang',
       baseModel: 'Tradisional Nusantara v2',
       complexity: 0.78,
       primaryColor: 'Monochrome',
@@ -161,7 +169,7 @@ class MockData {
       historyId: 'gen-040',
       categoryId: 'cat-006',
       imageUrl: _placeholder,
-      title: 'Songket Tampuk Manggis',
+      title: 'Songket Rangkiang',
       baseModel: 'Tradisional Nusantara v2',
       complexity: 0.82,
       primaryColor: 'Monochrome',
@@ -173,7 +181,7 @@ class MockData {
       historyId: 'gen-039',
       categoryId: 'cat-003',
       imageUrl: _placeholder,
-      title: 'Songket Bunga Cina',
+      title: 'Songket Bungo Satangkai',
       baseModel: 'Tradisional Nusantara v2',
       complexity: 0.70,
       primaryColor: 'Monochrome',
@@ -185,7 +193,7 @@ class MockData {
       historyId: 'gen-038',
       categoryId: 'cat-008',
       imageUrl: _placeholder,
-      title: 'Songket Siku Keluang',
+      title: 'Songket Taratai',
       baseModel: 'Tradisional Nusantara v2',
       complexity: 0.90,
       primaryColor: 'Monochrome',
@@ -193,6 +201,7 @@ class MockData {
       createdAt: DateTime.utc(2023, 10, 20, 8),
     ),
   ];
+
 
   static int _historyCounter = 100;
 

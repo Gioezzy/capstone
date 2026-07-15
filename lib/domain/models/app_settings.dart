@@ -69,7 +69,7 @@ class AppSettings {
 
   static final AppSettings defaults = AppSettings(
     id: 'local',
-    baseUrl: 'https://gioezzy-capstone-model.hf.space',
+    baseUrl: 'https://songketmodel-production.up.railway.app',
     defaultResolution: Resolution.px128,
     isDarkMode: false,
     updatedAt: DateTime.now(),

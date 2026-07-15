@@ -40,7 +40,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Konfigurasi Generasi'), findsOneWidget);
-      expect(find.text('Pucuk Rebung'), findsOneWidget);
+      expect(find.text('Apel'), findsOneWidget);
 
       expect(find.byType(AttributeChip), findsNWidgets(4));
       for (final label in ['Simetris', 'Padat', 'Minimalis', 'Geometris']) {

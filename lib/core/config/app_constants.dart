@@ -8,6 +8,6 @@ class AppConstants {
   static const String appBuildNumber = '1';
   static const String researcherName = 'Giovanni Yuda Prastika';
   static const String coreTechnology = 'cDCGAN';
-  static const String defaultBaseUrl = 'https://gioezzy-capstone-model.hf.space';
+  static const String defaultBaseUrl = 'https://songketmodel-production.up.railway.app';
 }
 
