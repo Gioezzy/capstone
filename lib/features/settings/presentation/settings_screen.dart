@@ -8,6 +8,8 @@ import '../../../core/theme/app_typography.dart';
 import '../../../domain/models/enums.dart';
 import '../../../providers/settings_providers.dart';
 
+import '../../../core/widgets/primary_button.dart';
+
 // Settings tab. Bottom nav is provided by the router shell, so no nav here.
 // Relies on sharedPreferencesProvider being overridden at bootstrap.
 class SettingsScreen extends ConsumerStatefulWidget {
@@ -52,17 +54,41 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         children: [
           const _Label('Backend API URL'),
           const SizedBox(height: AppSpacing.sm),
-          TextField(
-            controller: _baseUrlController,
-            keyboardType: TextInputType.url,
-            autocorrect: false,
-            decoration: const InputDecoration(
-              hintText: 'https://api.songketai.dev/v1',
-            ),
-            onEditingComplete: () => _submitBaseUrl(_baseUrlController.text),
-            onSubmitted: _submitBaseUrl,
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _baseUrlController,
+                  keyboardType: TextInputType.url,
+                  autocorrect: false,
+                  decoration: const InputDecoration(
+                    hintText: 'https://api.songketai.dev/v1',
+                  ),
+                  onEditingComplete: () => _submitBaseUrl(_baseUrlController.text),
+                  onSubmitted: _submitBaseUrl,
+                ),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              PrimaryButton(
+                label: 'Simpan',
+                expand: false,
+                onPressed: () {
+                  _submitBaseUrl(_baseUrlController.text);
+                  FocusScope.of(context).unfocus();
+                  ScaffoldMessenger.of(context)
+                    ..hideCurrentSnackBar()
+                    ..showSnackBar(
+                      const SnackBar(
+                        content: Text('URL Backend berhasil diperbarui!'),
+                        behavior: SnackBarBehavior.floating,
+                      ),
+                    );
+                },
+              ),
+            ],
           ),
           const Divider(height: AppSpacing.xl),
+
           const _Label('Resolusi Gambar'),
           const SizedBox(height: AppSpacing.sm),
           DropdownButton<Resolution>(
