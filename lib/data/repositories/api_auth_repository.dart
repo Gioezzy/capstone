@@ -11,19 +11,17 @@ class ApiAuthRepository implements AuthRepository {
 
   @override
   Future<Token> login(String username, String password) async {
-    // backend expects form-data (OAuth2PasswordRequestForm)
-    final formData = FormData.fromMap({
-      'username': username,
-      'password': password,
-    });
-    
     final data = await _client.post(
       ApiEndpoints.login,
-      data: formData,
+      data: {
+        'username': username,
+        'password': password,
+      },
     );
     
     return Token.fromJson(data as Map<String, dynamic>);
   }
+
 
   @override
   Future<User> register(String username, String email, String password) async {
